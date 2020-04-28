@@ -1,7 +1,9 @@
-﻿namespace Emptywolf.Stocks
+﻿using System.Threading.Tasks;
+
+namespace Emptywolf.Stocks
 {
     public interface IStockRetriever
     {
-        Stock GetStock(string ticker);
+        Task<Stock> GetStockAsync(string ticker);
     }
 }

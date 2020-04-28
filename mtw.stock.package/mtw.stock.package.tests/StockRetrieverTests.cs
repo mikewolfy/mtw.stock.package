@@ -1,5 +1,6 @@
 using Emptywolf.Stocks;
 using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace mtw.stock.package.tests
@@ -7,14 +8,14 @@ namespace mtw.stock.package.tests
     public class StockRetrieverTests
     {
         [Fact]
-        public void Test()
+        public async Task Test()
         {
             //setup
             var ticker = "AAPL";
             var retriever = new StockRetriever();
 
             //execute
-            var result = retriever.GetStock(ticker);
+            var result = await retriever.GetStockAsync(ticker);
 
             //validate
             Assert.NotNull(result);
