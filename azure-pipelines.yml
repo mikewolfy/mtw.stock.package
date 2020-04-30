@@ -12,7 +12,7 @@ pool:
 variables:
   buildConfiguration: 'Release'
 
-name: $(Rev:.r)
+name: 1.0$(Rev:.r)
 steps:
 - task: DotNetCoreCLI@2
   displayName: Build
