@@ -33,6 +33,8 @@ steps:
     arguments: '--configuration $(buildConfiguration) --collect "Code coverage"'
 
 #https://stackoverflow.com/questions/52312672/vsts-azure-devops-auto-increment-nuget-package-version-on-pack
+#https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/package/nuget?view=azure-devops
+
 # - task: DotNetCoreCLI@2
 #   inputs:
 #     command: 'pack'
