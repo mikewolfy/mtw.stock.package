@@ -32,21 +32,28 @@ steps:
     projects: '**/*tests/*.csproj'
     arguments: '--configuration $(buildConfiguration) --collect "Code coverage"'
 
+#https://stackoverflow.com/questions/52312672/vsts-azure-devops-auto-increment-nuget-package-version-on-pack
+# - task: DotNetCoreCLI@2
+#   inputs:
+#     command: 'pack'
+#     packagesToPack: '**/*.csproj'
+#     versioningScheme: 'byPrereleaseNumber'
+#     majorVersion: '1'
+#     minorVersion: '1'
+#     patchVersion: $(buildNumber)
+
 - task: DotNetCoreCLI@2
   inputs:
     command: 'pack'
     packagesToPack: '**/*.csproj'
-    versioningScheme: 'byPrereleaseNumber'
-    majorVersion: '1'
-    minorVersion: '1'
-    patchVersion: '0'
+    versioningScheme: 'byEnvVar'
+    versionEnvVar: 'Build.BuildNumber'
 
-# - task: DotNetCoreCLI@2
+# - task: NuGetCommand@2
 #   inputs:
-#     command: 'push'
-#     packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
-#     nuGetFeedType: 'external'
-#     publishFeedCredentials: 'Nuget-Emptywolf.Stocks'
+#     command: 'pack'
+#     packagesToPack: '**/*.csproj'
+#     versioningScheme: 'byBuildNumber'
 
 - task: NuGetCommand@2
   inputs:
