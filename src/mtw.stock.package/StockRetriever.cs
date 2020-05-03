@@ -8,13 +8,18 @@ namespace Emptywolf.Stocks
 {
     public class StockRetriever: IStockRetriever
     {
-        private readonly HttpClient client;
+        private readonly HttpClient _client;
+
+        public StockRetriever(HttpClient client)
+        {
+            _client = client;
+        }
 
         public StockRetriever()
         {
-            client = new HttpClient();
-            client.BaseAddress = new Uri("https://api.iextrading.com/1.0/");
-            client.DefaultRequestHeaders.Accept.Add
+            _client = new HttpClient();
+            _client.BaseAddress = new Uri("https://api.iextrading.com/1.0/");
+            _client.DefaultRequestHeaders.Accept.Add
             (
                 new MediaTypeWithQualityHeaderValue("application/json")
             );
@@ -24,7 +29,7 @@ namespace Emptywolf.Stocks
         {
             try
             {
-                HttpResponseMessage task = await client.GetAsync($"stock/{ticker}/book");
+                HttpResponseMessage task = await _client.GetAsync($"stock/{ticker}/book");
                 string jsonString = await task.Content.ReadAsStringAsync();
                 IexResponse response = JsonConvert.DeserializeObject<IexResponse>(jsonString);
 
