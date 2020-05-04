@@ -13,7 +13,7 @@ namespace Emptywolf.Stocks
         private readonly IMapper _mapper;
         private readonly HttpClient _client;
         private readonly Dictionary<string, Stock> _stockCache;
-        private readonly int _cacheTimeMinutes = 5;
+        private readonly int _cacheTimeSeconds = 120;
 
         public StockRetriever(HttpClient client, IMapper mapper)
         {
@@ -36,10 +36,19 @@ namespace Emptywolf.Stocks
         {
             try
             {
+                var cachedStock = _stockCache[ticker.ToUpper()];
+                if (cachedStock != null && DateTime.UtcNow.Subtract(cachedStock.LastUpdated).TotalSeconds < _cacheTimeSeconds)
+                {
+                    return cachedStock;
+                }
+
                 HttpResponseMessage task = await _client.GetAsync($"stock/{ticker}/book");
                 string jsonString = await task.Content.ReadAsStringAsync();
                 IexResponse response = JsonConvert.DeserializeObject<IexResponse>(jsonString);
-                return _mapper.MapIexResponseToStock(response);
+
+                var newStock = _mapper.MapIexResponseToStock(response);
+                _stockCache[ticker.ToUpper()] = newStock;
+                return newStock;
             }
             catch (Exception e)
             {
