@@ -10,36 +10,44 @@ namespace Emptywolf.Stocks
 {
     public class StockRetriever: IStockRetriever
     {
-        private readonly IMapper _mapper;
-        private readonly HttpClient _client;
-        private readonly Dictionary<string, Stock> _stockCache;
+        private IMapper _mapper;
+        private HttpClient _client;
+        private Dictionary<string, Stock> _stockCache;
         private readonly int _cacheTimeSeconds = 120;
 
         public StockRetriever(HttpClient client, IMapper mapper)
+        {
+            Initialize(client, mapper);
+        }
+
+        public StockRetriever()
+        {
+            var client = new HttpClient();
+            client.BaseAddress = new Uri("https://api.iextrading.com/1.0/");
+            client.DefaultRequestHeaders.Accept.Add
+            (
+                new MediaTypeWithQualityHeaderValue("application/json")
+            );
+            Initialize(client, new Mapper());
+        }
+
+        private void Initialize(HttpClient client, IMapper mapper)
         {
             _mapper = mapper;
             _client = client;
             _stockCache = new Dictionary<string, Stock>();
         }
 
-        public StockRetriever()
-        {
-            _client = new HttpClient();
-            _client.BaseAddress = new Uri("https://api.iextrading.com/1.0/");
-            _client.DefaultRequestHeaders.Accept.Add
-            (
-                new MediaTypeWithQualityHeaderValue("application/json")
-            );
-        }
-
         public async Task<Stock> GetStockAsync(string ticker)
         {
             try
             {
-                var cachedStock = _stockCache[ticker.ToUpper()];
-                if (cachedStock != null && DateTime.UtcNow.Subtract(cachedStock.LastUpdated).TotalSeconds < _cacheTimeSeconds)
+                if (_stockCache.TryGetValue(ticker.ToUpper(), out var cachedStock))
                 {
-                    return cachedStock;
+                    if (cachedStock != null && DateTime.UtcNow.Subtract(cachedStock.LastUpdated).TotalSeconds < _cacheTimeSeconds)
+                    {
+                        return cachedStock;
+                    }
                 }
 
                 HttpResponseMessage task = await _client.GetAsync($"stock/{ticker}/book");
@@ -47,7 +55,15 @@ namespace Emptywolf.Stocks
                 IexResponse response = JsonConvert.DeserializeObject<IexResponse>(jsonString);
 
                 var newStock = _mapper.MapIexResponseToStock(response);
-                _stockCache[ticker.ToUpper()] = newStock;
+
+                if(_stockCache.ContainsKey(ticker.ToUpper()))
+                {
+                    _stockCache[ticker.ToUpper()] = newStock;
+                }
+                else
+                { 
+                    _stockCache.Add(ticker.ToUpper(), newStock);
+                }
                 return newStock;
             }
             catch (Exception e)
