@@ -110,6 +110,41 @@ namespace mtw.stock.package.tests
             _mockMapper.Verify(m => m.MapIexResponseToStock(It.IsAny<IexResponse>()), Times.Exactly(2));
         }
 
+        [Fact]
+        public async Task TestCaching()
+        {
+            //setup
+            var ticker = "AAPL";
+            var path = $"/stock/{ticker}/book";
+
+            var mockResponse = GetIexResponse();
+
+            HttpResponseMessage mockHttpResponse = new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(JsonConvert.SerializeObject(mockResponse), Encoding.UTF8, "application/json")
+            };
+
+
+            var client = GetMockClient(new MockClientConfigurator
+            {
+                MessagesToReturn = new Dictionary<string, HttpResponseMessage> {
+                    { path, mockHttpResponse }
+                }
+            });
+            var retriever = new StockRetriever(client, new Mapper());
+
+            //execute
+            var result = await retriever.GetStockAsync("AAPL");
+            await Task.Delay(1100);
+            var result2 = await retriever.GetStockAsync("AAPL");
+
+            //validate
+            Assert.NotNull(result);
+            Assert.NotNull(result2);
+            Assert.Equal(result.LastUpdated, result2.LastUpdated);
+        }
+
         private void SetupMocks()
         {
             _mockMapper.Setup(m => m.MapIexResponseToStock(It.IsAny<IexResponse>()))
