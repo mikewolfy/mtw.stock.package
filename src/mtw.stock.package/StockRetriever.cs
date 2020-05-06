@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -8,50 +10,61 @@ namespace Emptywolf.Stocks
 {
     public class StockRetriever: IStockRetriever
     {
-        private readonly HttpClient _client;
+        private IMapper _mapper;
+        private HttpClient _client;
+        private Dictionary<string, Stock> _stockCache;
+        private readonly int _cacheTimeSeconds = 120;
 
-        public StockRetriever(HttpClient client)
+        public StockRetriever(HttpClient client, IMapper mapper)
         {
-            _client = client;
+            Initialize(client, mapper);
         }
 
         public StockRetriever()
         {
-            _client = new HttpClient();
-            _client.BaseAddress = new Uri("https://api.iextrading.com/1.0/");
-            _client.DefaultRequestHeaders.Accept.Add
+            var client = new HttpClient();
+            client.BaseAddress = new Uri("https://api.iextrading.com/1.0/");
+            client.DefaultRequestHeaders.Accept.Add
             (
                 new MediaTypeWithQualityHeaderValue("application/json")
             );
+            Initialize(client, new Mapper());
+        }
+
+        private void Initialize(HttpClient client, IMapper mapper)
+        {
+            _mapper = mapper;
+            _client = client;
+            _stockCache = new Dictionary<string, Stock>();
         }
 
         public async Task<Stock> GetStockAsync(string ticker)
         {
             try
             {
+                if (_stockCache.TryGetValue(ticker.ToUpper(), out var cachedStock))
+                {
+                    if (cachedStock != null && DateTime.UtcNow.Subtract(cachedStock.LastUpdated).TotalSeconds < _cacheTimeSeconds)
+                    {
+                        return cachedStock;
+                    }
+                }
+
                 HttpResponseMessage task = await _client.GetAsync($"stock/{ticker}/book");
                 string jsonString = await task.Content.ReadAsStringAsync();
                 IexResponse response = JsonConvert.DeserializeObject<IexResponse>(jsonString);
 
-                decimal price = response.quote.latestPrice.HasValue ? response.quote.latestPrice.Value : 0;
-                decimal open = response.quote.open.HasValue ? response.quote.open.Value : 0;
-                decimal change = price - open;
-                decimal percentageChange = price == 0 ? 0 : change / price * 100;
+                var newStock = _mapper.MapIexResponseToStock(response);
 
-                var stock = new Stock()
+                if(_stockCache.ContainsKey(ticker.ToUpper()))
                 {
-                    Ticker = ticker,
-                    Company = response.quote.companyName,
-                    Price = price,
-                    PE = response.quote.peRatio.HasValue ? response.quote.peRatio.Value : 0,
-                    Week52High = response.quote.week52High.HasValue ? response.quote.week52High.Value : 0,
-                    Week52Low = response.quote.week52Low.HasValue ? response.quote.week52Low.Value : 0,
-                    Sector = response.quote.sector,
-                    DailyChange = change,
-                    DailyPercentageChange = percentageChange
-                };
-                stock.Eps = stock.PE != 0 ? stock.Price / stock.PE : 0;
-                return stock;
+                    _stockCache[ticker.ToUpper()] = newStock;
+                }
+                else
+                { 
+                    _stockCache.Add(ticker.ToUpper(), newStock);
+                }
+                return newStock;
             }
             catch (Exception e)
             {
@@ -59,23 +72,21 @@ namespace Emptywolf.Stocks
             }
         }
 
-        private class IexResponse
+        public async Task<IEnumerable<Stock>> GetStocksAsync(string[] tickers)
         {
-            public IexResponseQuote quote { get; set; }
-        }
+            var stocks = new List<Stock>();
+            var tasks = tickers.Select(t => GetStockAsync(t));
+            var results = await Task.WhenAll(tasks);
 
-        private class IexResponseQuote
-        {
-            public string symbol { get; set; }
-            public string companyName { get; set; }
-            public string sector { get; set; }
-            public decimal? latestPrice { get; set; }
-            public decimal? open { get; set; }
-            public decimal? peRatio { get; set; }
-            public decimal? week52High { get; set; }
-            public decimal? week52Low { get; set; }
-            public decimal? change { get; set; }
-            public decimal? changePercent { get; set; }
+            results.ToList().ForEach(r =>
+            {
+                if (r != null)
+                {
+                    stocks.Add(r);
+                }
+            });
+
+            return stocks.OrderBy(s => s.Ticker).ToList();
         }
     }
 }

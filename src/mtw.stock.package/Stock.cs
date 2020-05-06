@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Emptywolf.Stocks
 {
@@ -16,5 +14,6 @@ namespace Emptywolf.Stocks
         public decimal Week52Low { get; set; }
         public decimal DailyChange { get; set; }
         public decimal DailyPercentageChange { get; set; }
+        public DateTime LastUpdated { get; set; }
     }
 }
