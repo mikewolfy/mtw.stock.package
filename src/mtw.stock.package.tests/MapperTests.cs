@@ -17,7 +17,7 @@ namespace mtw.stock.package.tests
                     symbol = "AAPL",
                     change = null,
                     companyName = "Apple",
-                    latestPrice = 215.50M,
+                    latestPrice = 215.5050M,
                     open = 210.75M,
                     peRatio = 30.45M,
                     week52High = 250.10M,
@@ -35,7 +35,7 @@ namespace mtw.stock.package.tests
             Assert.Equal(iexResponse.quote.symbol, stock.Ticker);
             Assert.Equal(iexResponse.quote.companyName, stock.Company);
             Assert.Equal(iexResponse.quote.sector, stock.Sector);
-            Assert.Equal(iexResponse.quote.latestPrice, stock.Price);
+            Assert.Equal(Math.Round(iexResponse.quote.latestPrice.Value, 2), stock.Price);
             Assert.Equal(iexResponse.quote.week52High, stock.Week52High);
             Assert.Equal(iexResponse.quote.week52Low, stock.Week52Low);
             Assert.False(stock.DailyPercentageChange == 0);
