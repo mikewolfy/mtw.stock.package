@@ -20,10 +20,11 @@ namespace mtw.stock.package.tests
                     latestPrice = 215.5050M,
                     open = 210.75M,
                     peRatio = 30.45M,
-                    week52High = 250.10M,
-                    week52Low = 160.75M,
+                    week52High = 250.10564M,
+                    week52Low = 160.75645M,
                     changePercent = 0.20M,
-                    sector = "Technology"
+                    sector = "Technology",
+                    ytdChange = 0.0987540M
                 }
             };
             var mapper = new Mapper();
@@ -36,11 +37,12 @@ namespace mtw.stock.package.tests
             Assert.Equal(iexResponse.quote.companyName, stock.Company);
             Assert.Equal(iexResponse.quote.sector, stock.Sector);
             Assert.Equal(Math.Round(iexResponse.quote.latestPrice.Value, 2), stock.Price);
-            Assert.Equal(iexResponse.quote.week52High, stock.Week52High);
-            Assert.Equal(iexResponse.quote.week52Low, stock.Week52Low);
+            Assert.Equal(Math.Round(iexResponse.quote.week52High.Value, 2), stock.Week52High);
+            Assert.Equal(Math.Round(iexResponse.quote.week52Low.Value, 2), stock.Week52Low);
             Assert.False(stock.DailyPercentageChange == 0);
             Assert.False(stock.DailyChange == 0);
             Assert.True(DateTime.UtcNow.Subtract(stock.LastUpdated).TotalSeconds < 20);
+            Assert.Equal(Math.Round(iexResponse.quote.ytdChange.Value, 4), stock.YearToDateChange);
         }
     }
 }
