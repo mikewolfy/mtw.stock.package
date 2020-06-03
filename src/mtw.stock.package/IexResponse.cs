@@ -17,5 +17,6 @@
         public decimal? week52Low { get; set; }
         public decimal? change { get; set; }
         public decimal? changePercent { get; set; }
+        public decimal? ytdChange { get; set; }
     }
 }
