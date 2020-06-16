@@ -13,8 +13,11 @@ namespace Emptywolf.Stocks
 
             decimal price = response.quote.latestPrice.HasValue ? response.quote.latestPrice.Value : 0;
             decimal open = response.quote.open.HasValue ? response.quote.open.Value : 0;
+            decimal close = response.quote.close.HasValue ? response.quote.close.Value : 0;
             decimal change = price - open;
             decimal percentageChange = price == 0 ? 0 : change / price * 100;
+            decimal changeSinceClose = price - close;
+            decimal percentageChangeSinceClose = price == 0 ? 0 : changeSinceClose / price * 100;
 
             var stock = new Stock()
             {
@@ -27,6 +30,8 @@ namespace Emptywolf.Stocks
                 Sector = response.quote.sector,
                 DailyChange = Math.Round(change, 2),
                 DailyPercentageChange = Math.Round(percentageChange, 2),
+                DailyChangeSinceLastClose = Math.Round(changeSinceClose, 2),
+                DailyPercentageChangeSinceLastClose = Math.Round(percentageChangeSinceClose, 2),
                 YearToDateChange = response.quote.ytdChange.HasValue ? Math.Round(response.quote.ytdChange.Value, 4) : 0,
                 LastUpdated = DateTime.UtcNow
             };

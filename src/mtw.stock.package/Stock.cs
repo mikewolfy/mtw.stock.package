@@ -14,6 +14,8 @@ namespace Emptywolf.Stocks
         public decimal Week52Low { get; set; }
         public decimal DailyChange { get; set; }
         public decimal DailyPercentageChange { get; set; }
+        public decimal DailyChangeSinceLastClose { get; set; }
+        public decimal DailyPercentageChangeSinceLastClose { get; set; }
         public decimal YearToDateChange { get; set; }
         public DateTime LastUpdated { get; set; }
     }

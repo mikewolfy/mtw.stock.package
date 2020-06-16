@@ -24,7 +24,8 @@ namespace mtw.stock.package.tests
                     week52Low = 160.75645M,
                     changePercent = 0.20M,
                     sector = "Technology",
-                    ytdChange = 0.0987540M
+                    ytdChange = 0.0987540M,
+                    close = 220.5050M
                 }
             };
             var mapper = new Mapper();
@@ -41,6 +42,8 @@ namespace mtw.stock.package.tests
             Assert.Equal(Math.Round(iexResponse.quote.week52Low.Value, 2), stock.Week52Low);
             Assert.False(stock.DailyPercentageChange == 0);
             Assert.False(stock.DailyChange == 0);
+            Assert.False(stock.DailyPercentageChangeSinceLastClose == 0);
+            Assert.False(stock.DailyChangeSinceLastClose == 0);
             Assert.True(DateTime.UtcNow.Subtract(stock.LastUpdated).TotalSeconds < 20);
             Assert.Equal(Math.Round(iexResponse.quote.ytdChange.Value, 4), stock.YearToDateChange);
         }
