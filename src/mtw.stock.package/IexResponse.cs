@@ -18,5 +18,6 @@
         public decimal? change { get; set; }
         public decimal? changePercent { get; set; }
         public decimal? ytdChange { get; set; }
+        public decimal? close { get; set; }
     }
 }
