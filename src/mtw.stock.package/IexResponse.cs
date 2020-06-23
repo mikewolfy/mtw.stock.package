@@ -10,6 +10,7 @@
         public string symbol { get; set; }
         public string companyName { get; set; }
         public string sector { get; set; }
+        public string calculationPrice { get; set; }
         public decimal? latestPrice { get; set; }
         public decimal? open { get; set; }
         public decimal? peRatio { get; set; }

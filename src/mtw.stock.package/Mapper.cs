@@ -11,9 +11,11 @@ namespace Emptywolf.Stocks
                 return null;
             }
 
-            decimal price = response.quote.latestPrice.HasValue ? response.quote.latestPrice.Value : 0;
+            decimal latestPrice = response.quote.latestPrice.HasValue ? response.quote.latestPrice.Value : 0;
             decimal open = response.quote.open.HasValue ? response.quote.open.Value : 0;
             decimal close = response.quote.close.HasValue ? response.quote.close.Value : 0;
+
+            decimal price = response.quote.calculationPrice == "previousclose" ? close : latestPrice;
             decimal change = price - open;
             decimal percentageChange = price == 0 ? 0 : change / price * 100;
             decimal changeSinceClose = price - close;
