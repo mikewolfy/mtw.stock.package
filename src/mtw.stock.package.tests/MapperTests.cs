@@ -6,8 +6,10 @@ namespace mtw.stock.package.tests
 {
     public class MapperTests
     {
-        [Fact]
-        public void MapIexResponseToStockSuccess()
+        [Theory]
+        [InlineData(215.5050, 210.6050, "tops", 215.5050, false)]
+        [InlineData(215.5050, 210.6050, "previousclose", 210.6050, true)]
+        public void MapIexResponseToStockSuccess(decimal latestPrice, decimal close, string calculationType, decimal price, bool dailyChangeZero)
         {
             //setup
             var iexResponse = new IexResponse
@@ -16,8 +18,9 @@ namespace mtw.stock.package.tests
                 {
                     symbol = "AAPL",
                     change = null,
+                    calculationPrice = calculationType,
                     companyName = "Apple",
-                    latestPrice = 215.5050M,
+                    latestPrice = latestPrice,
                     open = 210.75M,
                     peRatio = 30.45M,
                     week52High = 250.10564M,
@@ -25,7 +28,7 @@ namespace mtw.stock.package.tests
                     changePercent = 0.20M,
                     sector = "Technology",
                     ytdChange = 0.0987540M,
-                    close = 220.5050M
+                    close = close
                 }
             };
             var mapper = new Mapper();
@@ -37,13 +40,13 @@ namespace mtw.stock.package.tests
             Assert.Equal(iexResponse.quote.symbol, stock.Ticker);
             Assert.Equal(iexResponse.quote.companyName, stock.Company);
             Assert.Equal(iexResponse.quote.sector, stock.Sector);
-            Assert.Equal(Math.Round(iexResponse.quote.latestPrice.Value, 2), stock.Price);
+            Assert.Equal(Math.Round(price, 2), stock.Price);
             Assert.Equal(Math.Round(iexResponse.quote.week52High.Value, 2), stock.Week52High);
             Assert.Equal(Math.Round(iexResponse.quote.week52Low.Value, 2), stock.Week52Low);
             Assert.False(stock.DailyPercentageChange == 0);
             Assert.False(stock.DailyChange == 0);
-            Assert.False(stock.DailyPercentageChangeSinceLastClose == 0);
-            Assert.False(stock.DailyChangeSinceLastClose == 0);
+            Assert.Equal(dailyChangeZero, stock.DailyPercentageChangeSinceLastClose == 0);
+            Assert.Equal(dailyChangeZero, stock.DailyChangeSinceLastClose == 0);
             Assert.True(DateTime.UtcNow.Subtract(stock.LastUpdated).TotalSeconds < 20);
             Assert.Equal(Math.Round(iexResponse.quote.ytdChange.Value, 4), stock.YearToDateChange);
         }
