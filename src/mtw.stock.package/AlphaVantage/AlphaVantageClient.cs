@@ -11,8 +11,9 @@ namespace Emptywolf.Stocks.AlphaVantage
         private HttpClient _client;
         private string _key;
 
-        public AlphaVantageClient(HttpClient client)
+        public AlphaVantageClient(HttpClient client, AlphaVantageConfiguration config)
         {
+            _key = config.ApiKey;
             _client = client;
         }
 
