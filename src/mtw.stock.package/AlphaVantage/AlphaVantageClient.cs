@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Emptywolf.Stocks.AlphaVantage
 {
-    public class AlphaVantageClient
+    public class AlphaVantageClient: IAlphaVantageClient
     {
         private HttpClient _client;
         private string _key;
