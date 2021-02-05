@@ -14,7 +14,7 @@ namespace mtw.stock.package.tests.AlphaVantage
             var retriever = new AlphaVantageClient("demo");
 
             //execute
-            var result = await retriever.GetStock(ticker);
+            var result = await retriever.GetStockOverview(ticker);
 
             //validate
             Assert.NotNull(result);
