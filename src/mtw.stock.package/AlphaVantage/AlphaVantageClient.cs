@@ -1,4 +1,6 @@
 ﻿using Emptywolf.Stocks.AlphaVantage.Models;
+using Emptywolf.Stocks.Constants;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Net.Http;
@@ -11,9 +13,9 @@ namespace Emptywolf.Stocks.AlphaVantage
         private HttpClient _client;
         private string _key;
 
-        public AlphaVantageClient(HttpClient client, AlphaVantageConfiguration config)
+        public AlphaVantageClient(HttpClient client, IConfiguration config)
         {
-            _key = config.ApiKey;
+            _key = config[AlphaVantageConfiguration.AlphaVantageApiKey];
             _client = client;
         }
 
