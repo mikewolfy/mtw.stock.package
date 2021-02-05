@@ -5,6 +5,6 @@ namespace Emptywolf.Stocks.AlphaVantage
 {
     public interface IAlphaVantageClient
     {
-        Task<OverviewResponseDto> GetStock(string ticker);
+        Task<OverviewResponseDto> GetStockOverview(string ticker);
     }
 }

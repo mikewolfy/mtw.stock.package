@@ -24,7 +24,7 @@ namespace Emptywolf.Stocks.AlphaVantage
             _client.BaseAddress = new Uri("https://www.alphavantage.co/");
         }
 
-        public async Task<OverviewResponseDto> GetStock(string ticker)
+        public async Task<OverviewResponseDto> GetStockOverview(string ticker)
         {
             HttpResponseMessage task = await _client.GetAsync($"/query?function=OVERVIEW&symbol={ticker}&apikey={_key}");
             string jsonString = await task.Content.ReadAsStringAsync();
