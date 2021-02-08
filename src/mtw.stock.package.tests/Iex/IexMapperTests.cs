@@ -1,10 +1,11 @@
 ﻿using Emptywolf.Stocks;
+using Emptywolf.Stocks.Iex.Models;
 using System;
 using Xunit;
 
-namespace mtw.stock.package.tests
+namespace mtw.stock.package.tests.Iex
 {
-    public class MapperTests
+    public class IexMapperTests
     {
         [Theory]
         [InlineData(215.5050, 210.6050, "tops", 215.5050, false)]
@@ -31,7 +32,7 @@ namespace mtw.stock.package.tests
                     close = close
                 }
             };
-            var mapper = new Mapper();
+            var mapper = new IexMapper();
 
             //execute
             var stock = mapper.MapIexResponseToStock(iexResponse);
