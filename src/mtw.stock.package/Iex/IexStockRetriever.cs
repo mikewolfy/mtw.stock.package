@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Emptywolf.Stocks.Iex.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,21 +7,21 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
-namespace Emptywolf.Stocks
+namespace Emptywolf.Stocks.Iex
 {
-    public class StockRetriever: IStockRetriever
+    public class IexStockRetriever: IStockRetriever
     {
-        private IMapper _mapper;
+        private IIexMapper _mapper;
         private HttpClient _client;
         private Dictionary<string, Stock> _stockCache;
         private readonly int _cacheTimeSeconds = 120;
 
-        public StockRetriever(HttpClient client, IMapper mapper)
+        public IexStockRetriever(HttpClient client, IIexMapper mapper)
         {
             Initialize(client, mapper);
         }
 
-        public StockRetriever()
+        public IexStockRetriever()
         {
             var client = new HttpClient();
             client.BaseAddress = new Uri("https://api.iextrading.com/1.0/");
@@ -28,10 +29,10 @@ namespace Emptywolf.Stocks
             (
                 new MediaTypeWithQualityHeaderValue("application/json")
             );
-            Initialize(client, new Mapper());
+            Initialize(client, new IexMapper());
         }
 
-        private void Initialize(HttpClient client, IMapper mapper)
+        private void Initialize(HttpClient client, IIexMapper mapper)
         {
             _mapper = mapper;
             _client = client;

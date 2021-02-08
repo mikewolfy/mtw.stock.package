@@ -1,4 +1,4 @@
-﻿namespace Emptywolf.Stocks
+﻿namespace Emptywolf.Stocks.Iex.Models
 {
     public class IexResponse
     {

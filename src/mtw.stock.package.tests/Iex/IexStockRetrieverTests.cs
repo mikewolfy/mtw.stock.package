@@ -1,4 +1,6 @@
 using Emptywolf.Stocks;
+using Emptywolf.Stocks.Iex;
+using Emptywolf.Stocks.Iex.Models;
 using Moq;
 using mtw.stock.package.tests.Helpers;
 using Newtonsoft.Json;
@@ -11,15 +13,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace mtw.stock.package.tests
+namespace mtw.stock.package.tests.Iex
 {
-    public class StockRetrieverTests
+    public class IexStockRetrieverTests
     {
-        Mock<IMapper> _mockMapper;
+        Mock<IIexMapper> _mockIexMapper;
 
-        public StockRetrieverTests()
+        public IexStockRetrieverTests()
         {
-            _mockMapper = new Mock<IMapper>();
+            _mockIexMapper = new Mock<IIexMapper>();
         }
 
         [Fact]
@@ -27,7 +29,7 @@ namespace mtw.stock.package.tests
         {
             //setup
             var ticker = "AAPL";
-            var retriever = new StockRetriever();
+            var retriever = new IexStockRetriever();
 
             //execute
             var result = await retriever.GetStockAsync(ticker);
@@ -54,14 +56,14 @@ namespace mtw.stock.package.tests
             {
                 MessagesToReturn = new Dictionary<string, HttpResponseMessage> { { path, mockHttpResponse } }
             });
-            var retriever = new StockRetriever(client, _mockMapper.Object);
+            var retriever = new IexStockRetriever(client, _mockIexMapper.Object);
 
             //execute
             var result = await retriever.GetStockAsync(ticker);
 
             //validate
             Assert.NotNull(result);
-            _mockMapper.Verify(m => m.MapIexResponseToStock(It.IsAny<IexResponse>()), Times.Once);
+            _mockIexMapper.Verify(m => m.MapIexResponseToStock(It.IsAny<IexResponse>()), Times.Once);
         }
 
         [Fact]
@@ -98,7 +100,7 @@ namespace mtw.stock.package.tests
                     { path2, mockHttpResponse2 }
                 }
             });
-            var retriever = new StockRetriever(client, _mockMapper.Object);
+            var retriever = new IexStockRetriever(client, _mockIexMapper.Object);
 
             //execute
             var result = await retriever.GetStocksAsync(new string[] { "AAPL", "MSFT" });
@@ -107,7 +109,7 @@ namespace mtw.stock.package.tests
             Assert.NotNull(result);
             Assert.Equal(ticker, result.ToList()[0].Ticker);
             Assert.Equal(ticker2, result.ToList()[1].Ticker);
-            _mockMapper.Verify(m => m.MapIexResponseToStock(It.IsAny<IexResponse>()), Times.Exactly(2));
+            _mockIexMapper.Verify(m => m.MapIexResponseToStock(It.IsAny<IexResponse>()), Times.Exactly(2));
         }
 
         [Fact]
@@ -132,7 +134,7 @@ namespace mtw.stock.package.tests
                     { path, mockHttpResponse }
                 }
             });
-            var retriever = new StockRetriever(client, new Mapper());
+            var retriever = new IexStockRetriever(client, new IexMapper());
 
             //execute
             var result = await retriever.GetStockAsync("AAPL");
@@ -147,7 +149,7 @@ namespace mtw.stock.package.tests
 
         private void SetupMocks()
         {
-            _mockMapper.Setup(m => m.MapIexResponseToStock(It.IsAny<IexResponse>()))
+            _mockIexMapper.Setup(m => m.MapIexResponseToStock(It.IsAny<IexResponse>()))
                 .Returns((IexResponse r) => new Stock() { Ticker = r.quote.symbol });
         }
 

@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Emptywolf.Stocks.Iex.Models;
+using System;
 
 namespace Emptywolf.Stocks
 {
-    public class Mapper: IMapper
+    public class IexMapper: IIexMapper
     {
         public Stock MapIexResponseToStock(IexResponse response)
         {
